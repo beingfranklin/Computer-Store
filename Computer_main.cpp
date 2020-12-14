@@ -67,7 +67,7 @@ public:
     double cPrice = 0;
 
     char Manufacturer[50];
-    float DisplayScreenSize;
+    float cScreenSize;
     bool screenAvailable = false;
     int CPUNumber = 0;
     int GPUNumber = 0;
@@ -91,7 +91,7 @@ public:
         fgets(cGPUModel, MAX_ARRAY_LIMIT, stdin);
         cout << "\nMemory: ";
         cin >> cMemory;
-        DisplayScreenSize = ShowDisplayScreenSize(computerTypeInput);
+        cScreenSize = ShowDisplayScreenSize(computerTypeInput);
         computerType = computerTypeInput;
         cout << "\nChoose Storage Type";
         cout << "\n1) SSD \n2) HDD \n3) SSHD\n";
@@ -205,6 +205,40 @@ void deleteAndRewriteFile(Computer localObject[], int length)
     ofs.close();
 }
 
+void printRecord(Computer obj)
+{
+    cout << "\nID: "
+         << obj.cStoreId;
+    cout << "\nManufacturer: "
+         << obj.Manufacturer;
+    cout << "\nCPU Brand: "
+         << obj.cCPUBrand;
+    cout << "\nCPU Model: "
+         << obj.cCPUModel;
+    cout << "\nGPU Brand: "
+         << obj.cGPUBrand;
+    cout << "\nGPU Model: "
+         << obj.cGPUModel;
+    cout << "\nGPU Model: "
+         << obj.cGPUModel;
+    cout << "\nMemory: "
+         << obj.cMemory;
+    cout << "\nScreen size: "
+         << obj.cScreenSize;
+    // TODO common fucntion
+    cout << "\nType: "
+         << obj.computerType;
+    // TODO common fucntion
+    cout << "\nChoose Storage Type"
+         << obj.storageType;
+    cout << "\nStorage: "
+         << obj.cStorage;
+    cout << "\nOS Type:"
+         << obj.os;
+    cout << "\nPrice: "
+         << obj.cPrice;
+}
+
 int fileToMemory(Computer localObject[])
 {
     int i = 0;
@@ -223,7 +257,7 @@ int fileToMemory(Computer localObject[])
             strcpy(localObject[i].cGPUBrand, obj.cGPUBrand);
             strcpy(localObject[i].cGPUModel, obj.cGPUModel);
             localObject[i].cMemory = obj.cMemory;
-            localObject[i].DisplayScreenSize = obj.DisplayScreenSize;
+            localObject[i].cScreenSize = obj.cScreenSize;
             localObject[i].computerType = obj.computerType;
             strcpy(localObject[i].storageType, obj.storageType);
             localObject[i].cStorage = obj.cStorage;
@@ -249,16 +283,12 @@ void addComputer()
     cout << "\nChoose the type of computer to be added: ";
     cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
     cin >> computerTypeInput;
-    // cin.ignore();
-
-    // cin.sync();
-    // cin.ignore (std::numeric_limits<std::streamsize>::max(), '\n');
     do
     {
         cin.ignore();
         if (computerTypeInput == 1)
         {
-            C.create('C');
+            C.create('L');
             C.inputIntoFile(C);
         }
         else if (computerTypeInput == 2)
@@ -315,36 +345,7 @@ void printAllComputers()
         {
             if (!obj.isDeleted)
             {
-                cout << "\nID: "
-                     << obj.cStoreId << "\n";
-                cout << "\nManufacturer: "
-                     << obj.Manufacturer;
-                cout << "\nCPU Brand: "
-                     << obj.cCPUBrand;
-                cout << "\nCPU Model: "
-                     << obj.cCPUModel;
-                cout << "\nGPU Brand: "
-                     << obj.cGPUBrand;
-                cout << "\nGPU Model: "
-                     << obj.cGPUModel;
-                cout << "\nGPU Model: "
-                     << obj.cGPUModel;
-                cout << "\nMemory: "
-                     << obj.cMemory;
-                cout << "\nScreen size: "
-                     << obj.DisplayScreenSize;
-                // TODO common fucntion
-                cout << "\nType: "
-                     << obj.computerType;
-                // TODO common fucntion
-                cout << "\nChoose Storage Type"
-                     << obj.storageType;
-                cout << "\nStorage: "
-                     << obj.cStorage;
-                cout << "\nOS Type:"
-                     << obj.os;
-                cout << "\nPrice: "
-                     << obj.cPrice;
+                printRecord(obj);
             }
             file_obj.read((char *)&obj, sizeof(obj));
         }
@@ -354,11 +355,13 @@ void printAllComputers()
 }
 void searchComputer()
 {
-    char searchTerm[10];
+    char searchTerm[10],searchTypeTerm;
+    int inputChoice = 0;
+    double max, min;
     cout << "\nSearch by: ";
-    cout << "\n1)ID \n2)Type \n3)Price \nStorage \nScreen Size";
-    cout << "\nInput ID: ";
-    cin.getline(searchTerm, 10);
+    cout << "\n1)ID \n2)Type \n3)Price \n4)Storage \n5)Screen Size";
+    cin >> inputChoice;
+
     // cin.ignore();
 
     ifstream file_obj;
@@ -368,44 +371,89 @@ void searchComputer()
     {
         Computer obj;
         file_obj.read((char *)&obj, sizeof(obj));
+        switch (inputChoice)
+        {
+        case 1:
+            cout << "\nInput ID: ";
+            cin.getline(searchTerm, 10);
+
+            break;
+        case 2:
+        int computerTypeInput=0;
+            cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
+            cin >> computerTypeInput;
+            cin.ignore();
+            if(computerTypeInput==1){
+            searchTypeTerm='L';
+            cout << "\nShowing the List of Laptops: ";
+            }
+            else if(computerTypeInput==2){
+            searchTypeTerm='D';
+            cout << "\nShowing the List of Desktops: ";
+            }
+            else if(computerTypeInput==3){
+            searchTypeTerm='S';
+            cout << "\nShowing the List of Servers: ";
+            }
+            break;
+        case 3:
+            cout << "\nMax price: ";
+            cin >> max;
+            cout << "\nMin price: ";
+            cin >> min;
+            cout << "\nShowing the List of Computers within that range: ";
+            break;
+        case 4:
+            cout << "\nMax storage: ";
+            cin >> max;
+            cout << "\nMin storage: ";
+            cin >> min;
+            cout << "\nShowing the List of Computers within that range: ";
+            break;
+        case 5:
+            cout << "\nMax Screen: ";
+            cin >> max;
+            cout << "\nMin  Screen: ";
+            cin >> min;
+            cout << "\nShowing the List of Computers within that range: ";
+            break;
+        default:
+            cout << "\nError  :";
+            break;
+        }
+
         while (!file_obj.eof())
         {
 
             // if (!obj.isDeleted && obj.cStoreId == searchTerm)
-            if (!obj.isDeleted && (strcmp(searchTerm, obj.cStoreId)))
+            if (!obj.isDeleted)
             {
-                cout << "\nRecord found at : ";
-                cout << "\nID: "
-                     << obj.cStoreId;
-                cout << "\nManufacturer: "
-                     << obj.Manufacturer;
-                cout << "\nCPU Brand: "
-                     << obj.cCPUBrand;
-                cout << "\nCPU Model: "
-                     << obj.cCPUModel;
-                cout << "\nGPU Brand: "
-                     << obj.cGPUBrand;
-                cout << "\nGPU Model: "
-                     << obj.cGPUModel;
-                cout << "\nGPU Model: "
-                     << obj.cGPUModel;
-                cout << "\nMemory: "
-                     << obj.cMemory;
-                cout << "\nScreen size: "
-                     << obj.DisplayScreenSize;
-                // TODO common fucntion
-                cout << "\nType: "
-                     << obj.computerType;
-                // TODO common fucntion
-                cout << "\nChoose Storage Type"
-                     << obj.storageType;
-                cout << "\nStorage: "
-                     << obj.cStorage;
-                cout << "\nOS Type:"
-                     << obj.os;
-                cout << "\nPrice: "
-                     << obj.cPrice;
+                if (strcmp(searchTerm, obj.cStoreId) && inputChoice==1)
+                {
+                    cout << "\nRecord found at : \n";
+                    printRecord(obj);
+                    break;
+                }
+                else if ((searchTypeTerm==obj.computerType) && inputChoice==2)
+                {
+                    cout << "\nRecord found at : \n";
+                    printRecord(obj);
+                    break;
+                }
+                else if ((obj.cPrice>min && obj.cPrice<max) && inputChoice==3)
+                {
+                    printRecord(obj);
+                }
+                else if ((obj.cStorage>min && obj.cStorage<max) && inputChoice==4)
+                {
+                    printRecord(obj);
+                }
+                else if ((obj.cScreenSize>min && obj.cScreenSize<max) && inputChoice==5)
+                {
+                    printRecord(obj);
+                }
             }
+
             file_obj.read((char *)&obj, sizeof(obj));
         }
     }
