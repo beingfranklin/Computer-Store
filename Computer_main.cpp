@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <iostream>
-#include <string.h>
+#include <string>
 
 using namespace std;
 
@@ -64,7 +64,7 @@ public:
     char storageType[10];
     float cStorage = 0;
     char os[10];
-    float cPrice = 0;
+    double cPrice = 0;
 
     char Manufacturer[50];
     float DisplayScreenSize;
@@ -72,13 +72,13 @@ public:
     int CPUNumber = 0;
     int GPUNumber = 0;
 
-    void create(char computerType)
+    void create(char computerTypeInput)
     {
         int tempType = 0;
-        cout << "\nNew Laptop Entry\n";
+        cout << "\nNew Computer Entry\n";
         cout << "\nPlease enter the following details:";
         cout << "\nID:";
-        fgets(cStoreId, MAX_ARRAY_LIMIT, stdin);
+        fgets(cStoreId, 6, stdin);
         cout << "\nManufacturer: ";
         fgets(Manufacturer, MAX_ARRAY_LIMIT, stdin);
         cout << "\nCPU Brand: ";
@@ -91,9 +91,8 @@ public:
         fgets(cGPUModel, MAX_ARRAY_LIMIT, stdin);
         cout << "\nMemory: ";
         cin >> cMemory;
-        // cout << "\nScreen size: ";
-        DisplayScreenSize = ShowDisplayScreenSize(computerType);
-        computerType = computerType;
+        DisplayScreenSize = ShowDisplayScreenSize(computerTypeInput);
+        computerType = computerTypeInput;
         cout << "\nChoose Storage Type";
         cout << "\n1) SSD \n2) HDD \n3) SSHD\n";
         cin >> tempType;
@@ -159,7 +158,7 @@ public:
         }
     }
 
-    int input(Computer obj)
+    int inputIntoFile(Computer obj)
     {
         ofstream fileObj;
         fileObj.open("Data.txt", ios::app);
@@ -187,6 +186,24 @@ class Server : public Computer
 
 public:
 };
+void deleteAndRewriteFile(Computer localObject[], int length)
+{
+    std::ofstream ofs;
+    ofs.open("Data.txt", std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+
+    for (int i = 0; i < length; ++i)
+    {
+        cout << localObject[i].cStoreId << endl;
+    }
+    ofs.open("Data.txt", std::ofstream::out);
+    for (int i = 0; i < length; ++i)
+    {
+        ofs.write((char *)&localObject[i], sizeof(*localObject));
+    }
+    // ofs.write((char *)&localObject, sizeof(localObject));
+    ofs.close();
+}
 
 int fileToMemory(Computer localObject[])
 {
@@ -232,53 +249,59 @@ void addComputer()
     cout << "\nChoose the type of computer to be added: ";
     cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
     cin >> computerTypeInput;
+    // cin.ignore();
 
+    // cin.sync();
+    // cin.ignore (std::numeric_limits<std::streamsize>::max(), '\n');
     do
     {
+        cin.ignore();
         if (computerTypeInput == 1)
         {
             C.create('C');
-            C.input(C);
+            C.inputIntoFile(C);
         }
         else if (computerTypeInput == 2)
         {
             C.create('D');
-            C.input(C);
+            C.inputIntoFile(C);
         }
         else if (computerTypeInput == 3)
         {
             C.create('S');
-            C.input(C);
+            C.inputIntoFile(C);
         }
         cout << "\nDo you want to add more record..(Y/N?)";
         cin >> ch;
     } while (ch == 'y' || ch == 'Y');
 }
 
-void removeComputer()
+int removeComputer(Computer localObject[], int length)
 {
-    ofstream outFile("temp.txt");
-    ifstream readFile("Data.txt");
-
-    string readLine;
-    string search;
-
-    cout << "Enter The ID to delete : ";
-    cin >> search;
-
-    while (getline(readFile, readLine))
+    char id[6];
+    cout << "\nInput the ID of computer to be deleted: ";
+    // fgets(id, 6, stdin);
+    cin.getline(id, 6);
+    for (int i = 0; i < length; ++i)
     {
-        if (readLine != search)
+        if (strcmp(id, localObject[i].cStoreId))
         {
-            outFile << readLine;
+            cout << "\nFound record matching ID..." << endl;
+            for (int j = i; j < length - 1; j++)
+            {
+                localObject[i] = localObject[i + 1];
+            }
+            --length;
+
+            cout << "\nRemoved record..." << endl;
         }
-        // else
-        // {
-        //     outFile<<readLine<<endl;
-        // }
+        else
+        {
+            cout << "\nCannot find record matching ID..." << endl;
+        }
     }
-    // remove("Data.txt");
-    // rename("temp.txt", "Data.txt");
+    deleteAndRewriteFile(localObject, length);
+    return length;
 }
 void printAllComputers()
 {
@@ -331,11 +354,16 @@ void printAllComputers()
 }
 void searchComputer()
 {
+    char searchTerm[10];
     cout << "\nSearch by: ";
     cout << "\n1)ID \n2)Type \n3)Price \nStorage \nScreen Size";
+    cout << "\nInput ID: ";
+    cin.getline(searchTerm, 10);
+    // cin.ignore();
+
     ifstream file_obj;
     file_obj.open("Data.txt", ios::in);
-    char searchTerm[10];
+
     if (file_obj)
     {
         Computer obj;
@@ -343,10 +371,12 @@ void searchComputer()
         while (!file_obj.eof())
         {
 
-            if (!obj.isDeleted && obj.cStoreId == searchTerm)
+            // if (!obj.isDeleted && obj.cStoreId == searchTerm)
+            if (!obj.isDeleted && (strcmp(searchTerm, obj.cStoreId)))
             {
+                cout << "\nRecord found at : ";
                 cout << "\nID: "
-                     << obj.cStoreId << "\n";
+                     << obj.cStoreId;
                 cout << "\nManufacturer: "
                      << obj.Manufacturer;
                 cout << "\nCPU Brand: "
@@ -376,8 +406,8 @@ void searchComputer()
                 cout << "\nPrice: "
                      << obj.cPrice;
             }
+            file_obj.read((char *)&obj, sizeof(obj));
         }
-        file_obj.read((char *)&obj, sizeof(obj));
     }
     file_obj.close();
 }
@@ -391,13 +421,6 @@ void printthefile(Computer localObject[], int length)
     }
 }
 
-void deleteFile()
-{
-    std::ofstream ofs;
-    ofs.open("Data.txt", std::ofstream::out | std::ofstream::trunc);
-    ofs.close();
-}
-
 int main()
 {
     Computer localObject[20];
@@ -409,13 +432,15 @@ int main()
     cout << "\nMain Menu: ";
     cout << "\n1) Add\n2) Remove\n3) Display\n4) Search\n5) Exit\n";
     cin >> inputChoice;
+    cin.ignore();
+    // cin.ignore (std::numeric_limits<std::streamsize>::max(), '\n');
     switch (inputChoice)
     {
     case 1:
         addComputer();
         break;
     case 2:
-        removeComputer();
+        length = removeComputer(localObject, length);
         break;
     case 3:
         printAllComputers();
@@ -424,7 +449,7 @@ int main()
         searchComputer();
         break;
     default:
-        // deleteFile();
+        // deleteAndRewriteFile(localObject, length);
         break;
     }
     cout << endl;
