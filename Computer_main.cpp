@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <iostream>
-// #include <iomanip.h>
+#include <string.h>
 
 using namespace std;
 
@@ -65,7 +65,6 @@ public:
     float cStorage = 0;
     char os[10];
     float cPrice = 0;
-    //
 
     char Manufacturer[50];
     float DisplayScreenSize;
@@ -168,6 +167,7 @@ public:
         {
             fileObj.write((char *)&obj, sizeof(obj));
         }
+        fileObj.close();
         return 0;
     }
 };
@@ -188,7 +188,7 @@ class Server : public Computer
 public:
 };
 
-void fileToMemory(Computer localObject[])
+int fileToMemory(Computer localObject[])
 {
     int i = 0;
     Computer obj;
@@ -218,30 +218,34 @@ void fileToMemory(Computer localObject[])
             file_obj.read((char *)&obj, sizeof(obj));
             i++;
         }
-        file_obj.close();
+        // file_obj.close();
     }
+    file_obj.close();
+    return i;
 }
 
 void addComputer()
 {
     Computer C;
-    char computerType, ch;
+    int computerTypeInput;
+    char ch;
     cout << "\nChoose the type of computer to be added: ";
-    cout << "\nL - Laptop \nD - Desktop \nS - Server \n";
-    cin >> computerType;
+    cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
+    cin >> computerTypeInput;
+
     do
     {
-        if (computerType == 'L' || computerType == 'l')
+        if (computerTypeInput == 1)
         {
             C.create('C');
             C.input(C);
         }
-        else if (computerType == 'D' || computerType == 'd')
+        else if (computerTypeInput == 2)
         {
             C.create('D');
             C.input(C);
         }
-        else if (computerType == 'S' || computerType == 's')
+        else if (computerTypeInput == 3)
         {
             C.create('S');
             C.input(C);
@@ -249,11 +253,32 @@ void addComputer()
         cout << "\nDo you want to add more record..(Y/N?)";
         cin >> ch;
     } while (ch == 'y' || ch == 'Y');
-    printAllComputers();
 }
 
 void removeComputer()
 {
+    ofstream outFile("temp.txt");
+    ifstream readFile("Data.txt");
+
+    string readLine;
+    string search;
+
+    cout << "Enter The ID to delete : ";
+    cin >> search;
+
+    while (getline(readFile, readLine))
+    {
+        if (readLine != search)
+        {
+            outFile << readLine;
+        }
+        // else
+        // {
+        //     outFile<<readLine<<endl;
+        // }
+    }
+    // remove("Data.txt");
+    // rename("temp.txt", "Data.txt");
 }
 void printAllComputers()
 {
@@ -265,52 +290,120 @@ void printAllComputers()
         file_obj.read((char *)&obj, sizeof(obj));
         while (!file_obj.eof())
         {
-            cout << "\nID: "
-                 << obj.cStoreId << "\n";
-            cout << "\nManufacturer: "
-                 << obj.Manufacturer;
-            cout << "\nCPU Brand: "
-                 << obj.cCPUBrand;
-            cout << "\nCPU Model: "
-                 << obj.cCPUModel;
-            cout << "\nGPU Brand: "
-                 << obj.cGPUBrand;
-            cout << "\nGPU Model: "
-                 << obj.cGPUModel;
-            cout << "\nGPU Model: "
-                 << obj.cGPUModel;
-            cout << "\nMemory: "
-                 << obj.cMemory;
-            cout << "\nScreen size: "
-                 << obj.DisplayScreenSize;
-            // TODO common fucntion
-            cout << "\nType: "
-                 << obj.computerType;
-            // TODO common fucntion
-            cout << "\nChoose Storage Type"
-                 << obj.storageType;
-            cout << "\nStorage: "
-                 << obj.cStorage;
-            cout << "\nOS Type:"
-                 << obj.os;
-            cout << "\nPrice: "
-                 << obj.cPrice;
+            if (!obj.isDeleted)
+            {
+                cout << "\nID: "
+                     << obj.cStoreId << "\n";
+                cout << "\nManufacturer: "
+                     << obj.Manufacturer;
+                cout << "\nCPU Brand: "
+                     << obj.cCPUBrand;
+                cout << "\nCPU Model: "
+                     << obj.cCPUModel;
+                cout << "\nGPU Brand: "
+                     << obj.cGPUBrand;
+                cout << "\nGPU Model: "
+                     << obj.cGPUModel;
+                cout << "\nGPU Model: "
+                     << obj.cGPUModel;
+                cout << "\nMemory: "
+                     << obj.cMemory;
+                cout << "\nScreen size: "
+                     << obj.DisplayScreenSize;
+                // TODO common fucntion
+                cout << "\nType: "
+                     << obj.computerType;
+                // TODO common fucntion
+                cout << "\nChoose Storage Type"
+                     << obj.storageType;
+                cout << "\nStorage: "
+                     << obj.cStorage;
+                cout << "\nOS Type:"
+                     << obj.os;
+                cout << "\nPrice: "
+                     << obj.cPrice;
+            }
             file_obj.read((char *)&obj, sizeof(obj));
         }
+        cout << endl;
     }
+    file_obj.close();
 }
 void searchComputer()
 {
+    cout << "\nSearch by: ";
+    cout << "\n1)ID \n2)Type \n3)Price \nStorage \nScreen Size";
+    ifstream file_obj;
+    file_obj.open("Data.txt", ios::in);
+    char searchTerm[10];
+    if (file_obj)
+    {
+        Computer obj;
+        file_obj.read((char *)&obj, sizeof(obj));
+        while (!file_obj.eof())
+        {
+
+            if (!obj.isDeleted && obj.cStoreId == searchTerm)
+            {
+                cout << "\nID: "
+                     << obj.cStoreId << "\n";
+                cout << "\nManufacturer: "
+                     << obj.Manufacturer;
+                cout << "\nCPU Brand: "
+                     << obj.cCPUBrand;
+                cout << "\nCPU Model: "
+                     << obj.cCPUModel;
+                cout << "\nGPU Brand: "
+                     << obj.cGPUBrand;
+                cout << "\nGPU Model: "
+                     << obj.cGPUModel;
+                cout << "\nGPU Model: "
+                     << obj.cGPUModel;
+                cout << "\nMemory: "
+                     << obj.cMemory;
+                cout << "\nScreen size: "
+                     << obj.DisplayScreenSize;
+                // TODO common fucntion
+                cout << "\nType: "
+                     << obj.computerType;
+                // TODO common fucntion
+                cout << "\nChoose Storage Type"
+                     << obj.storageType;
+                cout << "\nStorage: "
+                     << obj.cStorage;
+                cout << "\nOS Type:"
+                     << obj.os;
+                cout << "\nPrice: "
+                     << obj.cPrice;
+            }
+        }
+        file_obj.read((char *)&obj, sizeof(obj));
+    }
+    file_obj.close();
+}
+
+void printthefile(Computer localObject[], int length)
+{
+
+    for (int i = 0; i < length; i++)
+    {
+        cout << localObject[i].Manufacturer << "\n";
+    }
+}
+
+void deleteFile()
+{
+    std::ofstream ofs;
+    ofs.open("Data.txt", std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
 }
 
 int main()
 {
     Computer localObject[20];
-    fileToMemory(localObject);
-    for (int i = 0; i < 20; i++)
-    {
-        cout << localObject[i].Manufacturer << "\n";
-    }
+    int length = 0;
+    length = fileToMemory(localObject);
+    // printthefile(localObject,length);
     int inputChoice = 0;
     cout << "\nComputer Store";
     cout << "\nMain Menu: ";
@@ -331,8 +424,9 @@ int main()
         searchComputer();
         break;
     default:
+        // deleteFile();
         break;
     }
-    // cout << "Exiting";
+    cout << endl;
     return 0;
 }
