@@ -1,65 +1,54 @@
-//***************************************************************
-//                   HEADER FILE USED IN PROJECT
-//****************************************************************
+//  Name : Franklin Antony
+//  ID : 200626510
+//  College Username : ec20076
 
 #include <fstream>
-// #include <conio.h>
 #include <stdio.h>
 #include <iostream>
-// #include <process.h>
-#include <string.h>
 // #include <iomanip.h>
 
 using namespace std;
 
-//***************************************************************
-//                   CLASS USED IN PROJECT
-//****************************************************************
 #define MAX_ARRAY_LIMIT 50
 
-float ShowLaptopScreenSize()
+float ShowDisplayScreenSize(char computerType)
 {
-    int LaptopScreenSize=0;
-    cout<<"\nChoose the Laptop Screen Size";
-    cout<<"\n1) 11.1" 
-        <<"\n2) 12.0"
-        <<"\n3) 13.3"
-        <<"\n4) 14.0"
-        <<"\n5) 15.6"
-        <<"\n6) 17.3";
-    cin>>LaptopScreenSize;
-    switch (LaptopScreenSize)
+    if (computerType == 'L')
     {
-    case 1:
-        return 11.1;
-        break;
-    case 2:
-        return 12.0;
-        break;
-    case 3:
-        return 13.3;
-        break;
-    case 4:
-        return 14.0;
-        break;
-    case 5:
-        return 15.6;
-        break;
-    case 6:
-        return 17.3;
-        break;
-    default:
-        return 0;
-        break;
+        int DisplayScreenSize = 0;
+        cout << "\nChoose the Laptop Screen Size";
+        cout << "\n1) 11.1 \n2) 12.0 \n3) 13.3 \n4) 14.0 \n5) 15.6 \n6) 17.3";
+        cin >> DisplayScreenSize;
+        switch (DisplayScreenSize)
+        {
+        case 1:
+            return 11.1;
+            break;
+        case 2:
+            return 12.0;
+            break;
+        case 3:
+            return 13.3;
+            break;
+        case 4:
+            return 14.0;
+            break;
+        case 5:
+            return 15.6;
+            break;
+        case 6:
+            return 17.3;
+            break;
+        default:
+            return 0.0;
+            break;
+        }
+    }
+    else
+    {
+        return 0.0;
     }
 }
-
-// class ProcessingPower {
-//     public:
-//     int CPUNumber;
-//     int GPUNumber;
-// }
-
 class Computer
 {
 public:
@@ -74,17 +63,15 @@ public:
     float cStorage = 0;
     char os[10];
     float cPrice = 0;
-};
+    //
 
-class Laptop : public Computer
-{
-public:
-    char lManufacturer[50];
-    float laptopScreenSize;
-    bool screenAvailable = true;
-    int CPUNumber = 1;
-    int GPUNumber = 1;
-    void create()
+    char Manufacturer[50];
+    float DisplayScreenSize;
+    bool screenAvailable = false;
+    int CPUNumber = 0;
+    int GPUNumber = 0;
+
+    void create(char computerType)
     {
         int tempType = 0;
         cout << "\nNew Laptop Entry\n";
@@ -92,7 +79,7 @@ public:
         cout << "\nID:";
         fgets(cStoreId, MAX_ARRAY_LIMIT, stdin);
         cout << "\nManufacturer: ";
-        fgets(lManufacturer, MAX_ARRAY_LIMIT, stdin);
+        fgets(Manufacturer, MAX_ARRAY_LIMIT, stdin);
         cout << "\nCPU Brand: ";
         fgets(cCPUBrand, MAX_ARRAY_LIMIT, stdin);
         cout << "\nCPU Model: ";
@@ -104,25 +91,22 @@ public:
         cout << "\nMemory: ";
         cin >> cMemory;
         // cout << "\nScreen size: ";
-        laptopScreenSize=ShowLaptopScreenSize();
-        computerType = 'L';
+        DisplayScreenSize = ShowDisplayScreenSize(computerType);
+        computerType = computerType;
         cout << "\nChoose Storage Type";
-        cout << "\n1) SSD \n2) HDD \n3) SSHD";
+        cout << "\n1) SSD \n2) HDD \n3) SSHD\n";
         cin >> tempType;
         if (tempType == 1)
         {
             strcpy(storageType, "SSD");
-
         }
         else if (tempType == 2)
         {
             strcpy(storageType, "HDD");
-
         }
         else if (tempType == 3)
         {
             strcpy(storageType, "SSHD");
-
         }
         else
         {
@@ -131,12 +115,11 @@ public:
         cout << "\nStorage: ";
         cin >> cStorage;
         cout << "\nChoose OS Type";
-        cout << "\n1) Mac \n2) Windows \n3) Linux";
+        cout << "\n1) Mac \n2) Windows \n3) Linux\n";
         cin >> tempType;
         if (tempType == 1)
         {
-           
-           strcpy(os, "Mac");
+            strcpy(os, "Mac");
         }
         else if (tempType == 2)
         {
@@ -149,116 +132,159 @@ public:
         else
         {
             strcpy(os, "No entry");
-
         }
         cout << "\nPrice: ";
         cin >> cPrice;
-        cout << "\n\nLaptop record added..";
+        if (computerType == 'L')
+        {
+            screenAvailable = true;
+            CPUNumber = 1;
+            GPUNumber = 1;
+            cout << "\n\nLaptop record added..";
+        }
+        else if (computerType == 'D')
+        {
+            screenAvailable = false;
+            CPUNumber = 2;
+            GPUNumber = 2;
+            cout << "\n\nDesktop record added..";
+        }
+        else if (computerType == 'S')
+        {
+            screenAvailable = false;
+            CPUNumber = 4;
+            GPUNumber = 4;
+            cout << "\n\nServer record added..";
+        }
     }
-    int input(Laptop obj)
+
+    int input(Computer obj)
     {
         ofstream fileObj;
         fileObj.open("Data.txt", ios::app);
         fileObj.write((char *)&obj, sizeof(obj));
         return 0;
     }
-    int printRecords()
-    {
-        ifstream file_obj;
-        file_obj.open("Data.txt", ios::in);
-        Laptop obj;
-        file_obj.read((char *)&obj, sizeof(obj));
-        while (!file_obj.eof())
-        {
-            cout << "ID: "
-                 << obj.cStoreId << "\n";
-            cout << "nManufacturer: "
-                 << obj.lManufacturer << "\n";
-            cout << "\nCPU Brand: "
-                 << obj.cCPUBrand;
-            cout << "\nCPU Model: "
-                 << obj.cCPUModel;
-            cout << "\nGPU Brand: "
-                 << obj.cGPUBrand;
-            cout << "\nGPU Model: "
-                 << obj.cGPUModel;
-            cout << "\nGPU Model: "
-                 << obj.cGPUModel;
-            cout << "\nMemory: "
-                 << obj.cMemory;
-            cout << "\nScreen size: "
-                 << obj.laptopScreenSize;
-            // TODO common fucntion
-            cout << "\nType: "
-                 << obj.computerType;
-            // TODO common fucntion
-            cout << "\nChoose Storage Type"
-                 << obj.storageType;
+};
 
-            cout << "\nStorage: "
-                 << obj.cStorage;
-            cout << "\nOS Type:"
-                 << obj.os;
-
-            cout << "\nPrice: "
-                 << obj.cPrice;
-            file_obj.read((char *)&obj, sizeof(obj));
-        }
-    }
+class Laptop : public Computer
+{
+public:
 };
 
 class Desktop : public Computer
 {
-    char dManufacturer[50];
-    float desktopScreenSize = 0.0;
-    bool screenAvailable = false;
-    int CPUNumber = 2;
-    int GPUNumber = 2;
-
 public:
 };
 
 class Server : public Computer
 {
-    char sManufacturer[50];
-    float desktopScreenSize = 0.0;
-    bool screenAvailable = false;
-    int CPUNumber = 4;
-    int GPUNumber = 4;
 
 public:
 };
 
-void addComputer(char computerType)
+void addComputer()
 {
-    char ch;
+    Computer C;
+    char computerType, ch;
+    cout << "\nChoose the type of computer to be added: ";
+    cout << "\n1) Laptop 2) Desktop 3) Server \n";
+    cin >> computerType;
     do
     {
-        if (computerType == 'L')
+        if (computerType == 'L' || computerType == 'l')
         {
-            Laptop L;
-            L.create();
-            L.input(L);
-            L.printRecords();
+            C.create('C');
+            C.input(C);
         }
-        // else if(Type == ComputerType.Server){
-
-        // }
-        // else if(Type == ComputerType.Desktop){
-
-        // }
-
-        // fp.write((char*)&st,sizeof(student));
-        cout << "\n\nDo you want to add more record..(y/n?)";
+        else if (computerType == 'D' || computerType == 'd')
+        {
+            C.create('D');
+            C.input(C);
+        }
+        else if (computerType == 'S' || computerType == 's')
+        {
+            C.create('S');
+            C.input(C);
+        }
+        cout << "\nDo you want to add more record..(Y/N?)";
         cin >> ch;
     } while (ch == 'y' || ch == 'Y');
-    // fp.close();
+}
+
+void removeComputer()
+{
+}
+void printAllComputers()
+{
+    ifstream file_obj;
+    file_obj.open("Data.txt", ios::in);
+    Computer obj;
+    file_obj.read((char *)&obj, sizeof(obj));
+    while (!file_obj.eof())
+    {
+        cout << "\nID: "
+                  << obj.cStoreId << "\n";
+        cout << "\nManufacturer: "
+                  << obj.Manufacturer;
+        cout << "\nCPU Brand: "
+                  << obj.cCPUBrand;
+        cout << "\nCPU Model: "
+                  << obj.cCPUModel;
+        cout << "\nGPU Brand: "
+                  << obj.cGPUBrand;
+        cout << "\nGPU Model: "
+                  << obj.cGPUModel;
+        cout << "\nGPU Model: "
+                  << obj.cGPUModel;
+        cout << "\nMemory: "
+                  << obj.cMemory;
+        cout << "\nScreen size: "
+                  << obj.DisplayScreenSize;
+        // TODO common fucntion
+        cout << "\nType: "
+                  << obj.computerType;
+        // TODO common fucntion
+        cout << "\nChoose Storage Type"
+                  << obj.storageType;
+        cout << "\nStorage: "
+                  << obj.cStorage;
+        cout << "\nOS Type:"
+                  << obj.os;
+        cout << "\nPrice: "
+                  << obj.cPrice;
+        file_obj.read((char *)&obj, sizeof(obj));
+    }
+}
+void searchComputer()
+{
 }
 
 int main()
 {
-    Laptop L1;
-    addComputer('L');
-    cout << "Added";
+    int inputChoice = 0;
+    cout << "\nComputer Store";
+    cout << "\nMain Menu: ";
+    cout << "\n1) Add\n2) Remove\n3) Display\n4) Search\n5) Exit\n";
+    cin >> inputChoice;
+    switch (inputChoice)
+    {
+    case 1:
+        addComputer();
+        break;
+    case 2:
+        removeComputer();
+        break;
+    case 3:
+        printAllComputers();
+        break;
+    case 4:
+        searchComputer();
+        break;
+    default:
+        break;
+    }
+    // cout << "Exiting";
     return 0;
+
 }
