@@ -186,23 +186,11 @@ class Server : public ComputerStore
 public:
 };
 
-void deleteAndRewriteFile(ComputerStore localObject[], int length)
+void clearFile()
 {
     std::ofstream ofs;
     ofs.open("Data.txt", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
-
-    // for (int i = 0; i < length; ++i)
-    // {
-    //     cout << localObject[i].cStoreId << endl;
-    // }
-    // ofs.open("Data.txt", std::ofstream::out);
-    // for (int i = 0; i < length; ++i)
-    // {
-    //     ofs.write((char *)&localObject[i], sizeof(*localObject));
-    // }
-    // // ofs.write((char *)&localObject, sizeof(localObject));
-    // ofs.close();
 }
 
 string returnComputerType(char type)
@@ -223,7 +211,7 @@ string returnComputerType(char type)
 void printRecord(ComputerStore obj)
 {
     cout << "\nId: "
-         << obj.cStoreId;
+         << obj.cStoreId << endl;
     cout << "Manufacturer: "
          << obj.Manufacturer;
     cout << "CPU Brand: "
@@ -304,10 +292,8 @@ int fileToMemory(ComputerStore (&localObject)[20])
             file_obj.read((char *)&obj, sizeof(obj));
             i++;
         }
-        // file_obj.close();
     }
     file_obj.close();
-    cout<<"length in read"<<i;
     return i;
 }
 
@@ -316,11 +302,11 @@ void addComputer()
     ComputerStore C;
     int computerTypeInput;
     char ch;
-    cout << "\nChoose the type of computer to be added: ";
-    cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
-    cin >> computerTypeInput;
     do
     {
+        cout << "\nChoose the type of computer to be added: ";
+        cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
+        cin >> computerTypeInput;
         cin.ignore();
         if (computerTypeInput == 1)
         {
@@ -340,7 +326,7 @@ void addComputer()
     } while (ch == 'y' || ch == 'Y');
 }
 
-int removeComputer(ComputerStore localObject[], int length)
+void removeComputer(ComputerStore localObject[], int &length)
 {
     ComputerStore C;
     char id[6];
@@ -348,7 +334,6 @@ int removeComputer(ComputerStore localObject[], int length)
     cout << "\nInput the ID of computer to be deleted: ";
     // fgets(id, 6, stdin);
     cin.getline(id, 6);
-    deleteAndRewriteFile(localObject, length);
     for (int i = 0; i < length; ++i)
     {
         if ((strcmp(id, localObject[i].cStoreId)) == 0)
@@ -357,29 +342,28 @@ int removeComputer(ComputerStore localObject[], int length)
             temp = i;
         }
     }
-    if (temp != -1)
+    if (temp > 0)
     {
-        for (int i = 0; i < length; ++i)
+        clearFile();
+        for (int j = 0; j < length; j++)
         {
-            if ((strcmp(id, localObject[i].cStoreId)) == 0)
+            if (j!=temp)
             {
-                C.inputIntoFile(localObject[i]);
+                C.inputIntoFile(localObject[j]);
             }
-            --length;
-            cout << "\nRemoved record..." << endl;
         }
-        deleteAndRewriteFile(localObject, length);
+        --length;
+        cout << "\nRemoved record..." << endl;
     }
     else
     {
         cout << "\nCannot find record matching ID..." << endl;
     }
-    return length;
 }
 
 void searchComputer(ComputerStore localObject[], int length)
 {
-    
+
     char searchTerm[6], searchTypeTerm;
     int inputChoice = 0, computerTypeInput = 0;
     double max, min;
@@ -396,7 +380,6 @@ void searchComputer(ComputerStore localObject[], int length)
         // cin >> searchTerm;
         cin.getline(searchTerm, 6);
         // cin.ignore();
-        cout << "\nsearchTerm Size is" << strlen(searchTerm) << endl;
         break;
     case 2:
         cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
@@ -447,10 +430,9 @@ void searchComputer(ComputerStore localObject[], int length)
 
     for (int i = 0; i < length; i++)
     {
-        cout << "\nlocalObject[i].cStoreId Size is" << localObject[i].cStoreId << "->" << strlen(localObject[i].cStoreId) << endl;
         if ((strcmp(searchTerm, localObject[i].cStoreId) == 0) && inputChoice == 1)
         {
-            cout << "\nRecord found at : \n";
+            cout << "\nRecord found at position : " << i + 1 << endl;
             printRecord(localObject[i]);
             recordfound = true;
             break;
@@ -501,7 +483,7 @@ int mainMenu(ComputerStore (&localObject)[20], int &length)
             addComputer();
             break;
         case 2:
-            length = removeComputer(localObject, length);
+            removeComputer(localObject, length);
             break;
         case 3:
             printAllComputers();
