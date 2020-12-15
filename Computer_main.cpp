@@ -11,15 +11,15 @@ using namespace std;
 
 #define MAX_ARRAY_LIMIT 50
 
-void printAllComputers();
 float ShowDisplayScreenSize(char computerType)
 {
     if (computerType == 'L')
     {
         int DisplayScreenSize = 0;
         cout << "\nChoose the Laptop Screen Size";
-        cout << "\n1) 11.1 \n2) 12.0 \n3) 13.3 \n4) 14.0 \n5) 15.6 \n6) 17.3";
+        cout << "\n1) 11.1 \n2) 12.0 \n3) 13.3 \n4) 14.0 \n5) 15.6 \n6) 17.3" << endl;
         cin >> DisplayScreenSize;
+        cin.ignore();
         switch (DisplayScreenSize)
         {
         case 1:
@@ -50,7 +50,7 @@ float ShowDisplayScreenSize(char computerType)
         return 0.0;
     }
 }
-class Computer
+class ComputerStore
 {
 public:
     bool isDeleted = false;
@@ -78,7 +78,7 @@ public:
         cout << "\nNew Computer Entry\n";
         cout << "\nPlease enter the following details:";
         cout << "\nID:";
-        fgets(cStoreId, 6, stdin);
+        cin.getline(cStoreId, 6);
         cout << "\nManufacturer: ";
         fgets(Manufacturer, MAX_ARRAY_LIMIT, stdin);
         cout << "\nCPU Brand: ";
@@ -158,7 +158,7 @@ public:
         }
     }
 
-    int inputIntoFile(Computer obj)
+    int inputIntoFile(ComputerStore obj)
     {
         ofstream fileObj;
         fileObj.open("Data.txt", ios::app);
@@ -171,78 +171,113 @@ public:
     }
 };
 
-class Laptop : public Computer
+class Laptop : public ComputerStore
 {
 public:
 };
 
-class Desktop : public Computer
+class Desktop : public ComputerStore
 {
 public:
 };
 
-class Server : public Computer
+class Server : public ComputerStore
 {
-
 public:
 };
-void deleteAndRewriteFile(Computer localObject[], int length)
+
+void deleteAndRewriteFile(ComputerStore localObject[], int length)
 {
     std::ofstream ofs;
     ofs.open("Data.txt", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
 
-    for (int i = 0; i < length; ++i)
-    {
-        cout << localObject[i].cStoreId << endl;
-    }
-    ofs.open("Data.txt", std::ofstream::out);
-    for (int i = 0; i < length; ++i)
-    {
-        ofs.write((char *)&localObject[i], sizeof(*localObject));
-    }
-    // ofs.write((char *)&localObject, sizeof(localObject));
-    ofs.close();
+    // for (int i = 0; i < length; ++i)
+    // {
+    //     cout << localObject[i].cStoreId << endl;
+    // }
+    // ofs.open("Data.txt", std::ofstream::out);
+    // for (int i = 0; i < length; ++i)
+    // {
+    //     ofs.write((char *)&localObject[i], sizeof(*localObject));
+    // }
+    // // ofs.write((char *)&localObject, sizeof(localObject));
+    // ofs.close();
 }
 
-void printRecord(Computer obj)
+string returnComputerType(char type)
 {
-    cout << "\nID: "
+    switch (type)
+    {
+    case 'L':
+        return "Laptop";
+    case 'D':
+        return "Desktop";
+    case 'S':
+        return "Server";
+    default:
+        return "Unknown";
+    }
+}
+
+void printRecord(ComputerStore obj)
+{
+    cout << "\nId: "
          << obj.cStoreId;
-    cout << "\nManufacturer: "
+    cout << "Manufacturer: "
          << obj.Manufacturer;
-    cout << "\nCPU Brand: "
+    cout << "CPU Brand: "
          << obj.cCPUBrand;
-    cout << "\nCPU Model: "
+    cout << "CPU Model: "
          << obj.cCPUModel;
-    cout << "\nGPU Brand: "
+    cout << "GPU Brand: "
          << obj.cGPUBrand;
-    cout << "\nGPU Model: "
+    cout << "GPU Model: "
          << obj.cGPUModel;
-    cout << "\nGPU Model: "
+    cout << "GPU Model: "
          << obj.cGPUModel;
-    cout << "\nMemory: "
+    cout << "Memory: "
          << obj.cMemory;
     cout << "\nScreen size: "
          << obj.cScreenSize;
-    // TODO common fucntion
     cout << "\nType: "
-         << obj.computerType;
-    // TODO common fucntion
-    cout << "\nChoose Storage Type"
+         << returnComputerType(obj.computerType);
+    cout << "\nChoose Storage Type: "
          << obj.storageType;
     cout << "\nStorage: "
          << obj.cStorage;
-    cout << "\nOS Type:"
+    cout << "\nOS Type: "
          << obj.os;
     cout << "\nPrice: "
-         << obj.cPrice;
+         << obj.cPrice << endl;
+}
+void printAllComputers()
+{
+    int i = 1;
+    ifstream file_obj;
+    file_obj.open("Data.txt", ios::in);
+    if (file_obj)
+    {
+        ComputerStore obj;
+        file_obj.read((char *)&obj, sizeof(obj));
+        while (!file_obj.eof())
+        {
+            if (!obj.isDeleted)
+            {
+                cout << "\nRecord " << i++ << endl;
+                printRecord(obj);
+            }
+            file_obj.read((char *)&obj, sizeof(obj));
+        }
+        cout << endl;
+    }
+    file_obj.close();
 }
 
-int fileToMemory(Computer localObject[])
+int fileToMemory(ComputerStore (&localObject)[20])
 {
     int i = 0;
-    Computer obj;
+    ComputerStore obj;
     ifstream file_obj;
     file_obj.open("Data.txt", ios::in);
     if (file_obj)
@@ -272,12 +307,13 @@ int fileToMemory(Computer localObject[])
         // file_obj.close();
     }
     file_obj.close();
+    cout<<"length in read"<<i;
     return i;
 }
 
 void addComputer()
 {
-    Computer C;
+    ComputerStore C;
     int computerTypeInput;
     char ch;
     cout << "\nChoose the type of computer to be added: ";
@@ -289,217 +325,217 @@ void addComputer()
         if (computerTypeInput == 1)
         {
             C.create('L');
-            C.inputIntoFile(C);
         }
         else if (computerTypeInput == 2)
         {
             C.create('D');
-            C.inputIntoFile(C);
         }
         else if (computerTypeInput == 3)
         {
             C.create('S');
-            C.inputIntoFile(C);
         }
+        C.inputIntoFile(C);
         cout << "\nDo you want to add more record..(Y/N?)";
         cin >> ch;
     } while (ch == 'y' || ch == 'Y');
 }
 
-int removeComputer(Computer localObject[], int length)
+int removeComputer(ComputerStore localObject[], int length)
 {
+    ComputerStore C;
     char id[6];
+    int temp = -1;
     cout << "\nInput the ID of computer to be deleted: ";
     // fgets(id, 6, stdin);
     cin.getline(id, 6);
+    deleteAndRewriteFile(localObject, length);
     for (int i = 0; i < length; ++i)
     {
-        if (strcmp(id, localObject[i].cStoreId))
+        if ((strcmp(id, localObject[i].cStoreId)) == 0)
         {
-            cout << "\nFound record matching ID..." << endl;
-            for (int j = i; j < length - 1; j++)
+            cout << "\nFound record matyching ID in position : " << i + 1 << endl;
+            temp = i;
+        }
+    }
+    if (temp != -1)
+    {
+        for (int i = 0; i < length; ++i)
+        {
+            if ((strcmp(id, localObject[i].cStoreId)) == 0)
             {
-                localObject[i] = localObject[i + 1];
+                C.inputIntoFile(localObject[i]);
             }
             --length;
-
             cout << "\nRemoved record..." << endl;
         }
-        else
-        {
-            cout << "\nCannot find record matching ID..." << endl;
-        }
+        deleteAndRewriteFile(localObject, length);
     }
-    deleteAndRewriteFile(localObject, length);
+    else
+    {
+        cout << "\nCannot find record matching ID..." << endl;
+    }
     return length;
 }
-void printAllComputers()
+
+void searchComputer(ComputerStore localObject[], int length)
 {
-    ifstream file_obj;
-    file_obj.open("Data.txt", ios::in);
-    if (file_obj)
-    {
-        Computer obj;
-        file_obj.read((char *)&obj, sizeof(obj));
-        while (!file_obj.eof())
-        {
-            if (!obj.isDeleted)
-            {
-                printRecord(obj);
-            }
-            file_obj.read((char *)&obj, sizeof(obj));
-        }
-        cout << endl;
-    }
-    file_obj.close();
-}
-void searchComputer()
-{
-    char searchTerm[10],searchTypeTerm;
-    int inputChoice = 0;
+    
+    char searchTerm[6], searchTypeTerm;
+    int inputChoice = 0, computerTypeInput = 0;
     double max, min;
+    bool recordfound = false;
     cout << "\nSearch by: ";
-    cout << "\n1)ID \n2)Type \n3)Price \n4)Storage \n5)Screen Size";
+    cout << "\n1)Id \n2)Type \n3)Price \n4)Storage \n5)Screen Size" << endl;
     cin >> inputChoice;
+    cin.ignore();
 
-    // cin.ignore();
-
-    ifstream file_obj;
-    file_obj.open("Data.txt", ios::in);
-
-    if (file_obj)
+    switch (inputChoice)
     {
-        Computer obj;
-        file_obj.read((char *)&obj, sizeof(obj));
-        switch (inputChoice)
+    case 1:
+        cout << "\nInput Id: ";
+        // cin >> searchTerm;
+        cin.getline(searchTerm, 6);
+        // cin.ignore();
+        cout << "\nsearchTerm Size is" << strlen(searchTerm) << endl;
+        break;
+    case 2:
+        cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
+        cin >> computerTypeInput;
+        cin.ignore();
+        if (computerTypeInput == 1)
         {
-        case 1:
-            cout << "\nInput ID: ";
-            cin.getline(searchTerm, 10);
-
-            break;
-        case 2:
-        int computerTypeInput=0;
-            cout << "\n1 - Laptop \n2 - Desktop \n3 - Server \n";
-            cin >> computerTypeInput;
-            cin.ignore();
-            if(computerTypeInput==1){
-            searchTypeTerm='L';
-            cout << "\nShowing the List of Laptops: ";
-            }
-            else if(computerTypeInput==2){
-            searchTypeTerm='D';
-            cout << "\nShowing the List of Desktops: ";
-            }
-            else if(computerTypeInput==3){
-            searchTypeTerm='S';
-            cout << "\nShowing the List of Servers: ";
-            }
-            break;
-        case 3:
-            cout << "\nMax price: ";
-            cin >> max;
-            cout << "\nMin price: ";
-            cin >> min;
-            cout << "\nShowing the List of Computers within that range: ";
-            break;
-        case 4:
-            cout << "\nMax storage: ";
-            cin >> max;
-            cout << "\nMin storage: ";
-            cin >> min;
-            cout << "\nShowing the List of Computers within that range: ";
-            break;
-        case 5:
-            cout << "\nMax Screen: ";
-            cin >> max;
-            cout << "\nMin  Screen: ";
-            cin >> min;
-            cout << "\nShowing the List of Computers within that range: ";
-            break;
-        default:
-            cout << "\nError  :";
-            break;
+            searchTypeTerm = 'L';
+            cout << "\nShowing the List of Laptops: " << endl;
         }
-
-        while (!file_obj.eof())
+        else if (computerTypeInput == 2)
         {
-
-            // if (!obj.isDeleted && obj.cStoreId == searchTerm)
-            if (!obj.isDeleted)
-            {
-                if (strcmp(searchTerm, obj.cStoreId) && inputChoice==1)
-                {
-                    cout << "\nRecord found at : \n";
-                    printRecord(obj);
-                    break;
-                }
-                else if ((searchTypeTerm==obj.computerType) && inputChoice==2)
-                {
-                    cout << "\nRecord found at : \n";
-                    printRecord(obj);
-                    break;
-                }
-                else if ((obj.cPrice>min && obj.cPrice<max) && inputChoice==3)
-                {
-                    printRecord(obj);
-                }
-                else if ((obj.cStorage>min && obj.cStorage<max) && inputChoice==4)
-                {
-                    printRecord(obj);
-                }
-                else if ((obj.cScreenSize>min && obj.cScreenSize<max) && inputChoice==5)
-                {
-                    printRecord(obj);
-                }
-            }
-
-            file_obj.read((char *)&obj, sizeof(obj));
+            searchTypeTerm = 'D';
+            cout << "\nShowing the List of Desktops: " << endl;
         }
+        else if (computerTypeInput == 3)
+        {
+            searchTypeTerm = 'S';
+            cout << "\nShowing the List of Servers: " << endl;
+        }
+        break;
+    case 3:
+        cout << "\nMax price: ";
+        cin >> max;
+        cout << "\nMin price: ";
+        cin >> min;
+        cin.ignore();
+        cout << "\nShowing the List of Computers within that range: " << endl;
+        break;
+    case 4:
+        cout << "\nMax storage: ";
+        cin >> max;
+        cout << "\nMin storage: ";
+        cin >> min;
+        cout << "\nShowing the List of Computers within that range: " << endl;
+        break;
+    case 5:
+        cout << "\nMax Screen: ";
+        cin >> max;
+        cout << "\nMin  Screen: ";
+        cin >> min;
+        cout << "\nShowing the List of Computers within that range: " << endl;
+        break;
+    default:
+        cout << "\nError  :";
+        break;
     }
-    file_obj.close();
-}
-
-void printthefile(Computer localObject[], int length)
-{
 
     for (int i = 0; i < length; i++)
     {
-        cout << localObject[i].Manufacturer << "\n";
+        cout << "\nlocalObject[i].cStoreId Size is" << localObject[i].cStoreId << "->" << strlen(localObject[i].cStoreId) << endl;
+        if ((strcmp(searchTerm, localObject[i].cStoreId) == 0) && inputChoice == 1)
+        {
+            cout << "\nRecord found at : \n";
+            printRecord(localObject[i]);
+            recordfound = true;
+            break;
+        }
+        else if (searchTypeTerm && (searchTypeTerm == localObject[i].computerType) && inputChoice == 2)
+        {
+            printRecord(localObject[i]);
+            recordfound = true;
+            break;
+        }
+        else if (min && max && (localObject[i].cPrice > min && localObject[i].cPrice < max) && inputChoice == 3)
+        {
+            printRecord(localObject[i]);
+            recordfound = true;
+        }
+        else if (min && max && (localObject[i].cStorage > min && localObject[i].cStorage < max) && inputChoice == 4)
+        {
+            printRecord(localObject[i]);
+            recordfound = true;
+        }
+        else if (min && max && (localObject[i].cScreenSize > min && localObject[i].cScreenSize < max) && inputChoice == 5)
+        {
+            printRecord(localObject[i]);
+            recordfound = true;
+        }
     }
+    if (!recordfound)
+    {
+        cout << "Record not found" << endl;
+    }
+}
+
+int mainMenu(ComputerStore (&localObject)[20], int &length)
+{
+    char menuChoice;
+    do
+    {
+        int inputChoice = 0;
+        cout << "\nComputer Store";
+        cout << "\nMain Menu: ";
+        cout << "\n1) Add\n2) Remove\n3) Display\n4) Search\n5) Exit\n";
+        cin >> inputChoice;
+        cin.ignore();
+        // cin.ignore (std::numeric_limits<std::streamsize>::max(), '\n');
+        switch (inputChoice)
+        {
+        case 1:
+            addComputer();
+            break;
+        case 2:
+            length = removeComputer(localObject, length);
+            break;
+        case 3:
+            printAllComputers();
+            break;
+        case 4:
+            searchComputer(localObject, length);
+            break;
+        case 5:
+            exit(0);
+        default:
+            cout << "\nInvalid choice" << endl;
+            break;
+        }
+        if (inputChoice != 5)
+        {
+            cout << "\nDo you want to continue to main menu? (Y/N)" << endl;
+            cin >> menuChoice;
+            cin.ignore();
+        }
+        else
+        {
+            exit(0);
+        }
+    } while (menuChoice == 'y' || menuChoice == 'Y');
+    length = fileToMemory(localObject);
+    return length;
 }
 
 int main()
 {
-    Computer localObject[20];
+    ComputerStore localObject[20];
     int length = 0;
     length = fileToMemory(localObject);
-    // printthefile(localObject,length);
-    int inputChoice = 0;
-    cout << "\nComputer Store";
-    cout << "\nMain Menu: ";
-    cout << "\n1) Add\n2) Remove\n3) Display\n4) Search\n5) Exit\n";
-    cin >> inputChoice;
-    cin.ignore();
-    // cin.ignore (std::numeric_limits<std::streamsize>::max(), '\n');
-    switch (inputChoice)
-    {
-    case 1:
-        addComputer();
-        break;
-    case 2:
-        length = removeComputer(localObject, length);
-        break;
-    case 3:
-        printAllComputers();
-        break;
-    case 4:
-        searchComputer();
-        break;
-    default:
-        // deleteAndRewriteFile(localObject, length);
-        break;
-    }
+    length = mainMenu(localObject, length);
     cout << endl;
     return 0;
 }
