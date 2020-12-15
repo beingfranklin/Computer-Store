@@ -11,7 +11,7 @@ using namespace std;
 
 #define MAX_ARRAY_LIMIT 50
 
-float ShowDisplayScreenSize(char computerType)
+float SetDisplayScreenSize(char computerType)
 {
     if (computerType == 'L')
     {
@@ -72,119 +72,107 @@ public:
     int CPUNumber = 0;
     int GPUNumber = 0;
 
-    void create(char computerTypeInput)
+    int inputIntoFile(ComputerStore obj);
+    void create(char computerTypeInput);
+};
+
+void ComputerStore::create(char computerTypeInput)
+{
+    int tempType = 0;
+    cout << "\nNew Computer Entry\n";
+    cout << "\nPlease enter the following details:";
+    cout << "\nID:";
+    cin.getline(cStoreId, 6);
+    cout << "\nManufacturer: ";
+    fgets(Manufacturer, MAX_ARRAY_LIMIT, stdin);
+    cout << "\nCPU Brand: ";
+    fgets(cCPUBrand, MAX_ARRAY_LIMIT, stdin);
+    cout << "\nCPU Model: ";
+    fgets(cCPUModel, MAX_ARRAY_LIMIT, stdin);
+    cout << "\nGPU Brand: ";
+    fgets(cGPUBrand, MAX_ARRAY_LIMIT, stdin);
+    cout << "\nGPU Model: ";
+    fgets(cGPUModel, MAX_ARRAY_LIMIT, stdin);
+    cout << "\nMemory: ";
+    cin >> cMemory;
+    cScreenSize = SetDisplayScreenSize(computerTypeInput);
+    computerType = computerTypeInput;
+    cout << "\nChoose Storage Type";
+    cout << "\n1) SSD \n2) HDD \n3) SSHD\n";
+    cin >> tempType;
+    if (tempType == 1)
     {
-        int tempType = 0;
-        cout << "\nNew Computer Entry\n";
-        cout << "\nPlease enter the following details:";
-        cout << "\nID:";
-        cin.getline(cStoreId, 6);
-        cout << "\nManufacturer: ";
-        fgets(Manufacturer, MAX_ARRAY_LIMIT, stdin);
-        cout << "\nCPU Brand: ";
-        fgets(cCPUBrand, MAX_ARRAY_LIMIT, stdin);
-        cout << "\nCPU Model: ";
-        fgets(cCPUModel, MAX_ARRAY_LIMIT, stdin);
-        cout << "\nGPU Brand: ";
-        fgets(cGPUBrand, MAX_ARRAY_LIMIT, stdin);
-        cout << "\nGPU Model: ";
-        fgets(cGPUModel, MAX_ARRAY_LIMIT, stdin);
-        cout << "\nMemory: ";
-        cin >> cMemory;
-        cScreenSize = ShowDisplayScreenSize(computerTypeInput);
-        computerType = computerTypeInput;
-        cout << "\nChoose Storage Type";
-        cout << "\n1) SSD \n2) HDD \n3) SSHD\n";
-        cin >> tempType;
-        if (tempType == 1)
-        {
-            strcpy(storageType, "SSD");
-        }
-        else if (tempType == 2)
-        {
-            strcpy(storageType, "HDD");
-        }
-        else if (tempType == 3)
-        {
-            strcpy(storageType, "SSHD");
-        }
-        else
-        {
-            strcpy(storageType, "No entry");
-        }
-        cout << "\nStorage: ";
-        cin >> cStorage;
-        cout << "\nChoose OS Type";
-        cout << "\n1) Mac \n2) Windows \n3) Linux\n";
-        cin >> tempType;
-        if (tempType == 1)
-        {
-            strcpy(os, "Mac");
-        }
-        else if (tempType == 2)
-        {
-            strcpy(os, "Windows");
-        }
-        else if (tempType == 3)
-        {
-            strcpy(os, "Linux");
-        }
-        else
-        {
-            strcpy(os, "No entry");
-        }
-        cout << "\nPrice: ";
-        cin >> cPrice;
-        if (computerType == 'L')
-        {
-            screenAvailable = true;
-            CPUNumber = 1;
-            GPUNumber = 1;
-            cout << "\n\nLaptop record added..";
-        }
-        else if (computerType == 'D')
-        {
-            screenAvailable = false;
-            CPUNumber = 2;
-            GPUNumber = 2;
-            cout << "\n\nDesktop record added..";
-        }
-        else if (computerType == 'S')
-        {
-            screenAvailable = false;
-            CPUNumber = 4;
-            GPUNumber = 4;
-            cout << "\n\nServer record added..";
-        }
+        strcpy(storageType, "SSD");
     }
-
-    int inputIntoFile(ComputerStore obj)
+    else if (tempType == 2)
     {
-        ofstream fileObj;
-        fileObj.open("Data.txt", ios::app);
-        if (fileObj)
-        {
-            fileObj.write((char *)&obj, sizeof(obj));
-        }
-        fileObj.close();
-        return 0;
+        strcpy(storageType, "HDD");
     }
-};
+    else if (tempType == 3)
+    {
+        strcpy(storageType, "SSHD");
+    }
+    else
+    {
+        strcpy(storageType, "No entry");
+    }
+    cout << "\nStorage: ";
+    cin >> cStorage;
+    cout << "\nChoose OS Type";
+    cout << "\n1) Mac \n2) Windows \n3) Linux\n";
+    cin >> tempType;
+    if (tempType == 1)
+    {
+        strcpy(os, "Mac");
+    }
+    else if (tempType == 2)
+    {
+        strcpy(os, "Windows");
+    }
+    else if (tempType == 3)
+    {
+        strcpy(os, "Linux");
+    }
+    else
+    {
+        strcpy(os, "No entry");
+    }
+    cout << "\nPrice: ";
+    cin >> cPrice;
+    if (computerType == 'L')
+    {
+        screenAvailable = true;
+        CPUNumber = 1;
+        GPUNumber = 1;
+        cout << "\n\nLaptop record added..";
+    }
+    else if (computerType == 'D')
+    {
+        screenAvailable = false;
+        CPUNumber = 2;
+        GPUNumber = 2;
+        cout << "\n\nDesktop record added..";
+    }
+    else if (computerType == 'S')
+    {
+        screenAvailable = false;
+        CPUNumber = 4;
+        GPUNumber = 4;
+        cout << "\n\nServer record added..";
+    }
+}
 
-class Laptop : public ComputerStore
+int ComputerStore::inputIntoFile(ComputerStore obj)
 {
-public:
-};
-
-class Desktop : public ComputerStore
-{
-public:
-};
-
-class Server : public ComputerStore
-{
-public:
-};
+    ofstream fileObj;
+    fileObj.open("Data.txt", ios::app);
+    if (fileObj)
+    {
+        fileObj.write((char *)&obj, sizeof(obj));
+    }
+    fileObj.close();
+    return 0;
+}
 
 void clearFile()
 {
@@ -260,6 +248,7 @@ void printAllComputers()
         cout << endl;
     }
     file_obj.close();
+    
 }
 
 int fileToMemory(ComputerStore (&localObject)[20])
@@ -347,7 +336,7 @@ void removeComputer(ComputerStore localObject[], int &length)
         clearFile();
         for (int j = 0; j < length; j++)
         {
-            if (j!=temp)
+            if (j != temp)
             {
                 C.inputIntoFile(localObject[j]);
             }
